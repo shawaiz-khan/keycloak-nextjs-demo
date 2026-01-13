@@ -3,7 +3,11 @@
 import { useKeycloak } from "@/hooks/useKeycloak";
 
 export default function Home() {
-  const { isAuthenticated, handleLogout, isLoading } = useKeycloak();
+  const {
+    isAuthenticated,
+    handleLogout,
+    isLoading
+  } = useKeycloak();
 
   return (
     <div className="flex min-h-screen p-10 justify-center items-center text-center bg-neutral-50 text-neutral-950">

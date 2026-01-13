@@ -3,9 +3,9 @@ services:
     image: postgres:15
     container_name: keycloak_postgres
     environment:
-        POSTGRES_DB: ${POSTGRES_DB}
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -27,17 +27,17 @@ services:
     depends_on:
       - postgres
     command: start-dev
-
-  nextjs:
-    image: shawaizkhan/keycloak-test-nextjs-app
-    environment:
-      NEXT_PUBLIC_KEYCLOAK_URL: ${NEXT_PUBLIC_KEYCLOAK_URL}
-      NEXT_PUBLIC_KEYCLOAK_REALM: ${NEXT_PUBLIC_KEYCLOAK_REALM}
-      NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: ${NEXT_PUBLIC_KEYCLOAK_CLIENT_ID}
-    ports:
-      - "3000:3000"
-    depends_on:
-      - keycloak
+  # ==== Commented because I want to test nextjs and deploy on vercel ====
+  # nextjs:
+  #   image: shawaizkhan/keycloak-test-nextjs-app
+  #   environment:
+  #     NEXT_PUBLIC_KEYCLOAK_URL: ${NEXT_PUBLIC_KEYCLOAK_URL}
+  #     NEXT_PUBLIC_KEYCLOAK_REALM: ${NEXT_PUBLIC_KEYCLOAK_REALM}
+  #     NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: ${NEXT_PUBLIC_KEYCLOAK_CLIENT_ID}
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - keycloak
 
 volumes:
   postgres_data:
