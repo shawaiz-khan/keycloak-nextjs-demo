@@ -1,43 +1,50 @@
+version: '3.8'
+
 services:
   postgres:
-    image: postgres:15
-    container_name: keycloak_postgres
+    image: postgres:16-alpine
+    restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password123
+      # This fixes the directory error seen in your logs
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   keycloak:
-    image: quay.io/keycloak/keycloak:21.1.1
-    container_name: keycloak
+    image: quay.io/keycloak/keycloak:23.0.6
+    command: start-dev --import-realm
+    restart: always
     environment:
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
+      # Database Configuration
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password123
+
+      # Admin Credentials
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      # Networking & Azure Specifics
+      KC_HOSTNAME: keycloaktest-hqd7chf7h8bjevha.centralus-01.azurewebsites.net
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY: edge
+
+      KC_LOG_LEVEL: info
     ports:
-      - "8080:8080"
+      - "80:8080"
     depends_on:
-      - postgres
-    command: start-dev
-  # ==== Commented because I want to test nextjs and deploy on vercel ====
-  # nextjs:
-  #   image: shawaizkhan/keycloak-test-nextjs-app
-  #   environment:
-  #     NEXT_PUBLIC_KEYCLOAK_URL: ${NEXT_PUBLIC_KEYCLOAK_URL}
-  #     NEXT_PUBLIC_KEYCLOAK_REALM: ${NEXT_PUBLIC_KEYCLOAK_REALM}
-  #     NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: ${NEXT_PUBLIC_KEYCLOAK_CLIENT_ID}
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - keycloak
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:

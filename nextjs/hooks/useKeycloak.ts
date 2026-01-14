@@ -7,7 +7,10 @@ export const useKeycloak = () => {
 
     const checkAuth = async () => {
         try {
-            let isAuth = await keycloak.init({ onLoad: "login-required" });
+            let isAuth = await keycloak.init({
+                onLoad: "login-required",
+                checkLoginIframe: false,
+            });
 
             if (!isAuth) {
                 throw new Error("Not Authenticated");
@@ -21,15 +24,15 @@ export const useKeycloak = () => {
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     const handleLogout = async () => {
         keycloak.logout({ redirectUri: window.location.origin });
-    }
+    };
 
     useEffect(() => {
         checkAuth();
     }, []);
 
     return { isAuthenticated, isLoading, checkAuth, handleLogout };
-}
+};
