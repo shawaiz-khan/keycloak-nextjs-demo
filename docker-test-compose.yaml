@@ -6,7 +6,6 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak_user
       POSTGRES_PASSWORD: KcDb#2026!Dev
-      # This fixes the directory error seen in your logs
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -18,26 +17,23 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.6
-    command: start --import-realm
+    command: start --import-realm --hostname-strict=false
     restart: always
     environment:
-      # Database Configuration
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_URL: jdbc:postgresql://pow-it-up.postgres.database.azure.com:5432/keycloak?sslmode=require
       KC_DB_USERNAME: keycloak_user
       KC_DB_PASSWORD: KcDb#2026!Dev
 
-      # Admin Credentials
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
 
-      # Networking & Azure Specifics
       KC_HOSTNAME: keycloaktest-hqd7chf7h8bjevha.centralus-01.azurewebsites.net
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
       KC_PROXY: edge
 
-      KC_LOG_LEVEL: info
+      WEBSITES_PORT: 8080
     ports:
       - "80:8080"
     depends_on:
